@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { UserRegisterDto } from './dto';
+import { UserLoginDto, UserRegisterDto } from './dto';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -15,7 +15,8 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: {
-            createUser: jest.fn()
+            createUser: jest.fn(),
+            login: jest.fn()
           }
         }
       ]
@@ -38,7 +39,20 @@ describe('UserController', () => {
 
       expect(service.createUser).toHaveBeenCalledWith(dto);
     })
-  })
+  });
+
+  describe('login', () => {
+    it('Should call the login method of the UserService',async () => {
+      const dto: UserLoginDto = {
+        email: 'test@test.com',
+        password: 'Admin123@'
+      }
+
+      await controller.login(dto);
+
+      expect(service.login).toHaveBeenCalledWith(dto);
+    })
+  });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();

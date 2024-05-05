@@ -1,8 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserRegisterDto, UserResponse } from './dto';
+import { UserLoginDto, UserRegisterDto, UserResponse } from './dto';
 import * as argon from 'argon2';
 
 @Injectable()
@@ -28,6 +28,32 @@ export class UserService {
                     ...dto
                 }
             });
+
+            delete user.password;
+
+            const token = await this.createToken(user.id, user.email);
+
+            const response = new UserResponse();
+            response.user = user;
+            response.token = token;
+
+            return response;
+        } catch(error) {
+            throw error;
+        }
+    }
+
+    async login(dto: UserLoginDto): Promise<UserResponse> {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {email: dto.email}
+            });
+
+            if (!user) throw new NotFoundException("User does not exist");
+
+            const pwMatches = await argon.verify(user.password, dto.password, {saltLength: 12});
+
+            if (!pwMatches) throw new BadRequestException("Incorrect email or password");
 
             delete user.password;
 
