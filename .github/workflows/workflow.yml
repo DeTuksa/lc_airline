@@ -15,6 +15,7 @@ jobs:
     env:
       USER_JWT_SECRET: "TestSecret"
       ORGANIZER_JWT_SECRET: "TestSecret"
+      DATABASE_URL: "postgresql://postgres:123@localhost:5434/lcairline?schema=public"
 
     steps:
       - name: Checkout code
