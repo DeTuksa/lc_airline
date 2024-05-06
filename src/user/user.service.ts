@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserLoginDto, UserRegisterDto, UserResponse } from './dto';
 import * as argon from 'argon2';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -64,6 +65,27 @@ export class UserService {
             response.token = token;
 
             return response;
+        } catch(error) {
+            throw error;
+        }
+    }
+
+    async getUser(user: User) {
+        try {
+            const userExist = await this.prisma.user.findUnique({
+                where: {email: user.email},
+                include: {
+                    booking: true
+                }
+            });
+
+            if(!userExist) throw new NotFoundException("User does not exist");
+
+            return {
+                message: "User retrieved successfully",
+                status: true,
+                user: userExist
+            }
         } catch(error) {
             throw error;
         }

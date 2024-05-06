@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StaffController } from './staff.controller';
 import { StaffService } from './staff.service';
-import { StaffRegisterDto } from './dto';
+import { StaffLoginDto, StaffRegisterDto } from './dto';
 
 describe('StaffController', () => {
   let controller: StaffController;
@@ -15,7 +15,8 @@ describe('StaffController', () => {
         {
           provide: StaffService,
           useValue: {
-            createStaff: jest.fn()
+            createStaff: jest.fn(),
+            login: jest.fn()
           }
         }
       ]
@@ -38,6 +39,19 @@ describe('StaffController', () => {
       await controller.createStaff(dto);
 
       expect(service.createStaff).toHaveBeenCalledWith(dto);
+    })
+  })
+
+  describe('login', () => {
+    it('Should call the login method of the StaffService', async () => {
+      const dto: StaffLoginDto = {
+        email: 'staff@test.com',
+        password: 'Admin123@'
+      }
+
+      await controller.login(dto);
+
+      expect(service.login).toHaveBeenCalledWith(dto);
     })
   })
 

@@ -13,6 +13,7 @@ async function bootstrap() {
     .setTitle('LC-Airline API')
     .setDescription('The LC-Airline API documentation')
     .setVersion('1.0')
+    .addBasicAuth()
     .addOAuth2()
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -20,8 +21,8 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.enableCors()
   app.use(urlencoded({ extended: true, limit: '50mb' }));
-  await app.listen(3000, '0.0.0.0', () => {
-    console.log(`Server is running on http://0.0.0.0:3000`);
+  await app.listen(8081, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0:8081`);
   });
 }
 bootstrap();
