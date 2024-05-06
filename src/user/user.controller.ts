@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { ApiBasicAuth, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserLoginDto, UserRegisterDto } from './dto';
@@ -29,6 +29,13 @@ export class UserController {
     @ApiBasicAuth()
     @ApiOperation({summary: "Get user"})
     getUser(@GetUser() user: User) {
+        return this.service.getUser(user.id);
+    }
+
+    @Get('/:id')
+    @UseGuards(UserGuard)
+    @ApiOperation({summary: "Get user by id"})
+    getUserById(@Param('id', ParseIntPipe) user: number) {
         return this.service.getUser(user);
     }
 }

@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { StaffLoginDto, StaffRegisterDto, StaffResponseDto } from './dto';
 import * as argon from 'argon2';
+import { Staff } from '@prisma/client';
 
 @Injectable()
 export class StaffService {
@@ -61,6 +62,27 @@ export class StaffService {
             response.token = token;
 
             return response;
+        } catch(error) {
+            throw error;
+        }
+    }
+
+    async getStaff(id: number) {
+        try {
+            const staff = await this.prisma.staff.findUnique({
+                where: {id: id},
+                include: {
+                    performances: true
+                }
+            });
+
+            if(!staff) throw new NotFoundException("Staff not found");
+
+            return {
+                message: "Staff Retrieved successfully",
+                status: true,
+                staff
+            }
         } catch(error) {
             throw error;
         }

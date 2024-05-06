@@ -70,16 +70,17 @@ export class UserService {
         }
     }
 
-    async getUser(user: User) {
+    async getUser(user: number) {
         try {
             const userExist = await this.prisma.user.findUnique({
-                where: {email: user.email},
+                where: {id: user},
                 include: {
                     booking: true
                 }
             });
 
             if(!userExist) throw new NotFoundException("User does not exist");
+            delete userExist.password;
 
             return {
                 message: "User retrieved successfully",
