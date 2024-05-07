@@ -3,8 +3,8 @@ import { PerformanceService } from './performance.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreatePerfomanceDto } from './dto';
 import { Staff } from '@prisma/client';
-import { GetUser } from 'src/auth/decorator';
-import { StaffGuard } from 'src/auth/guard';
+import { GetUser } from '../auth/decorator';
+import { StaffGuard } from '../auth/guard';
 
 @ApiTags('performance')
 @Controller('api/v1/performance')
