@@ -141,3 +141,39 @@ export class FirstFlight extends Aircraft {
         }
     }
 }
+
+export class SecondFlight extends Aircraft {
+    firstClassSeatingPlan: SeatingPlan;
+    businessClassSeatingPlan: SeatingPlan;
+    economyClassSeatingPlan: SeatingPlan;
+
+    constructor() {
+        super('Aircraft 2');
+        this.firstClassSeatingPlan = new SeatingPlan(4, 4);
+        this.businessClassSeatingPlan = new SeatingPlan(3, 6, 5);
+        this.economyClassSeatingPlan = new SeatingPlan(21, 6, 8);
+    }
+
+    printFlightLayout(): void {
+        console.log("Flight Layout:");
+        console.log("First Class:");
+        this.firstClassSeatingPlan.printAircraftLayout();
+        console.log("Business Class:");
+        this.businessClassSeatingPlan.printAircraftLayout();
+        console.log("Economy Class:");
+        this.economyClassSeatingPlan.printAircraftLayout();
+    }
+
+    toJSON() {
+        return {
+            firstClassSeatingPlan: this.firstClassSeatingPlan.seats,
+            businessClassSeatingPlan: this.businessClassSeatingPlan.seats,
+            economyClassSeatingPlan: this.economyClassSeatingPlan.seats
+        }
+    }
+}
+
+export enum AircraftType {
+    FirstFlight = 'firstFlight',
+    SecondFlight = 'secondFlight'
+}

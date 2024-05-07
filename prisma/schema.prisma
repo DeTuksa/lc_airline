@@ -60,7 +60,7 @@ model Performance {
   to        String
   departure DateTime
   arrival   DateTime
-  duration  Int
+  duration  String
   price     String
   createdBy Staff @relation(fields: [staffId], references: [id])
   staffId Int
