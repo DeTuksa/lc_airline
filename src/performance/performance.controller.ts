@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { PerformanceService } from './performance.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AircraftType } from './infrastructure';
 import { CreatePerfomanceDto } from './dto';
 import { Staff } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
@@ -25,5 +24,29 @@ export class PerformanceController {
         @GetUser() staff: Staff,
         @Body()dto: CreatePerfomanceDto) {
             return this.service.createPerformance(staff, dto);
-        }
+    }
+
+    @Get('/available')
+    @ApiOperation({summary: 'Fetch available performance'})
+    getAvailablePerformance() {
+        return this.service.getPerformances();
+    }
+
+    @Get('/performances/:id')
+    @UseGuards(StaffGuard)
+    @ApiOperation({summary: 'Fetch available performance by staff Id'})
+    getStaffPerformances(
+        @Param('id', ParseIntPipe)id: number
+    ) {
+        return this.service.getPerformanceByStaff(id);
+    }
+
+    @Get('/performances/')
+    @UseGuards(StaffGuard)
+    @ApiOperation({summary: 'Fetch available performance by staff Id'})
+    getCreatedPerformances(
+        @GetUser()staff: Staff
+    ) {
+        return this.service.getPerformanceByStaff(staff.id);
+    }
 }

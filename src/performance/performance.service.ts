@@ -57,4 +57,39 @@ export class PerformanceService {
             throw error;
         }
     }
+
+    async getPerformances() {
+        try {
+            const performances = await this.prisma.performance.findMany({
+                include: {
+                    createdBy: true
+                }
+            });
+            return {
+                message: "Performances fetched successfully",
+                performances
+            }
+        } catch(error) {
+            throw error;
+        }
+    }
+
+    async getPerformanceByStaff(id: number) {
+        try {
+            const performances = await this.prisma.performance.findMany({
+                where: {
+                    staffId: id
+                },
+                include: {
+                    createdBy: true
+                }
+            });
+            return {
+                message: "Performances fetched successfully",
+                performances
+            }
+        } catch(error) {
+            throw error;
+        }
+    }
 }
