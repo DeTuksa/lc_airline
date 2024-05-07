@@ -52,39 +52,10 @@ enum Role {
   manager
 }
 
-model Seat {
-  id            Int         @unique @default(autoincrement())
-  row           Int
-  column        Int
-  isBooked      Boolean
-  seatingPlan   SeatingPlan @relation(fields: [seatingplanId], references: [id])
-  seatingplanId Int
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-}
-
-model SeatingPlan {
-  id        Int      @unique @default(autoincrement())
-  layout    Seat[]
-  flights Flight[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Flight {
-  id        Int      @id @default(autoincrement())
-  flightNo  String   @unique @default(cuid())
-  seatingPlan SeatingPlan @relation(fields: [seatingPlanId], references: [id])
-  seatingPlanId Int
-  performances Performance[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Performance {
   id Int @id @default(autoincrement())
-  flight   Flight   @relation(fields: [flightId], references: [id])
-  flightId Int
+  performanceId  String @unique @default(cuid())
+  flight   Json
   from      String
   to        String
   departure DateTime
