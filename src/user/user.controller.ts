@@ -2,8 +2,8 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post,
 import { ApiBasicAuth, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserLoginDto, UserRegisterDto } from './dto';
-import { GetUser } from 'src/auth/decorator';
-import { UserGuard } from 'src/auth/guard';
+import { GetUser } from '../auth/decorator';
+import { UserGuard } from '../auth/guard';
 import { User } from '@prisma/client';
 
 @ApiTags('user')

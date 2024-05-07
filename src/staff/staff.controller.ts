@@ -2,9 +2,9 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post,
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StaffLoginDto, StaffRegisterDto } from './dto';
 import { StaffService } from './staff.service';
-import { GetUser } from 'src/auth/decorator';
+import { GetUser } from '../auth/decorator';
 import { Staff } from '@prisma/client';
-import { StaffGuard } from 'src/auth/guard';
+import { StaffGuard } from '../auth/guard';
 
 @ApiTags('staff')
 @Controller('api/v1/staff')
