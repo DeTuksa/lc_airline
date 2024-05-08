@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AircraftType, FirstFlight, SecondFlight } from './infrastructure';
-import { Staff } from '@prisma/client';
+import { Aircraft, AircraftType, FirstFlight, Seat, SeatingPlan, SecondFlight } from './infrastructure';
+import { Prisma, Staff, User } from '@prisma/client';
 import { CreatePerfomanceDto } from './dto';
 
 @Injectable()
@@ -14,11 +14,14 @@ export class PerformanceService {
     async fetchFlights() {
         try {
             const firstAircraft = new FirstFlight();
-            const flight = firstAircraft.toJSON();
+            const secondAircraft = new SecondFlight();
+            const firstFlight = firstAircraft.toJSON();
+            const secondFlight = secondAircraft.toJSON();
             return {
                 message: "Available Flights",
                 aircrafts: [
-                    flight
+                    firstFlight,
+                    secondFlight
                 ]
             }
         } catch(error) {
@@ -44,7 +47,8 @@ export class PerformanceService {
                     staffId: staff.id,
                 },
                 include: {
-                    createdBy: true
+                    createdBy: true,
+                    bookings: true
                 }
             });
 
@@ -62,7 +66,8 @@ export class PerformanceService {
         try {
             const performances = await this.prisma.performance.findMany({
                 include: {
-                    createdBy: true
+                    createdBy: true,
+                    bookings: true
                 }
             });
             return {
@@ -81,7 +86,8 @@ export class PerformanceService {
                     staffId: id
                 },
                 include: {
-                    createdBy: true
+                    createdBy: true,
+                    bookings: true
                 }
             });
             return {
@@ -92,4 +98,66 @@ export class PerformanceService {
             throw error;
         }
     }
+
+    async bookFlight(
+        user: User,
+        id: number,
+        flightClass: FlightClass, 
+        noOfSeats: number,
+        userSeats?: Seat[] | null, // Rename seats to userSeats to avoid confusion
+    ) {
+        try {
+            const performance = await this.prisma.performance.findUnique({
+                where: {id},
+                include: {
+                    createdBy: true,
+                    bookings: true
+                }
+            });
+    
+            if(!performance) throw new NotFoundException("Performance not found!");
+    
+            const aircraft = Aircraft.fromJson(JSON.stringify(performance.flight));
+            let bookedSeats: Seat[];
+            if(flightClass === FlightClass.First) {
+                bookedSeats = aircraft.bookFirstClass(noOfSeats, userSeats);
+            } else if (flightClass === FlightClass.Business) {
+                bookedSeats = aircraft.bookBusinessClass(noOfSeats, userSeats);
+            } else {
+                aircraft.printFlightLayout();
+                bookedSeats = aircraft.bookEconomyClass(noOfSeats, userSeats);
+            }
+
+            const [updatedPerf, booking] = await this.prisma.$transaction([
+                this.prisma.performance.update({
+                    where: {id: performance.id},
+                    data: {
+                    flight: aircraft
+                    }
+                }),
+                this.prisma.booking.create({
+                    data: {
+                        performanceId: performance.id,
+                        seats: SeatingPlan.seatsArrayToJson(bookedSeats),
+                        noOfTickets: noOfSeats,
+                        userId: user.id
+                    },
+                    include: {
+                        performance: true,
+                        user: true
+                    }
+                })
+            ]);
+            return booking;
+        } catch(error) {
+            throw error;
+        }
+    }
+    
+}
+
+export enum FlightClass {
+    Economy = "Economy",
+    Business = "Business",
+    First = "First"
 }

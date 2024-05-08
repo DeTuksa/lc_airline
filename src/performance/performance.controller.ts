@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
-import { PerformanceService } from './performance.service';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseEnumPipe, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { FlightClass, PerformanceService } from './performance.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreatePerfomanceDto } from './dto';
-import { Staff } from '@prisma/client';
+import { Staff, User } from '@prisma/client';
 import { GetUser } from '../auth/decorator';
-import { StaffGuard } from '../auth/guard';
+import { StaffGuard, UserGuard } from '../auth/guard';
 
 @ApiTags('performance')
 @Controller('api/v1/performance')
@@ -48,5 +48,18 @@ export class PerformanceController {
         @GetUser()staff: Staff
     ) {
         return this.service.getPerformanceByStaff(staff.id);
+    }
+
+    @Post('book')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(UserGuard)
+    @ApiOperation({summary: 'Book a performance'})
+    bookPerformance(
+        @GetUser() user: User,
+        @Query('id', ParseIntPipe) id: number,
+        @Query('flightClass', new ParseEnumPipe(FlightClass)) flightClass: FlightClass,
+        @Query('noOfSeats', ParseIntPipe)noOfSeats: number
+    ) {
+        return this.service.bookFlight(user, id, flightClass, noOfSeats);
     }
 }
